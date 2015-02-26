@@ -151,12 +151,7 @@ public class MainForm {
 	ActionListener btnTestListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			/*
-			System.out.println("Stuff happening..");
-			ServerThread server = new ServerThread(1234);
 
-			(new Thread(server)).start();
-			*/
 			Server server = new Server();
 			server.start();
 			try {
@@ -206,21 +201,20 @@ public class MainForm {
 		    kryo.register(SomeRequest.class);
 		    kryo.register(SomeResponse.class);
 
+
+		    
+		    client.addListener(new Listener() {
+		        public void received (Connection connection, Object object) {
+		           if (object instanceof SomeResponse) {
+		              SomeResponse response = (SomeResponse)object;
+		              System.out.println(response.text);
+		           }
+		        }
+		     });
+		   
 		    SomeRequest request = new SomeRequest();
-		    request.text = "Here is the request";
+		    request.text = "Here is the request...";
 		    client.sendTCP(request);
-			
-			/*
-			Client client = new Client("localhost", 1234);
-			
-			try {
-				client.connect();
-				client.readResponse();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			*/
 		}
 	};
 }
