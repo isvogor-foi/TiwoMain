@@ -18,6 +18,8 @@ import com.esotericsoftware.kryonet.Server;
 import com.tiwo.communication.Commands;
 import com.tiwo.communication.Commands.MOVEMENT;
 import com.tiwo.communication.Serial;
+import com.tiwo.communication.sockets.ClientSocket;
+import com.tiwo.communication.sockets.ServerSocket;
 import com.tiwo.communication.sockets.SomeRequest;
 import com.tiwo.communication.sockets.SomeResponse;
 import com.tiwo.keyboard.KeyDispatcher;
@@ -148,39 +150,20 @@ public class MainForm {
 		}
 	};
 	
+	ClientSocket client;
+	ServerSocket server;
 	ActionListener btnTestListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
-			Server server = new Server();
+		   //ServerSocket
+			server = ServerSocket.getInstance();
 			server.start();
-			try {
-				server.bind(1234);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			System.out.println("Pretty much done binding...");
+	
 			
-			 Kryo kryo = server.getKryo();
-			    kryo.register(SomeRequest.class);
-			    kryo.register(SomeResponse.class);
+			client = ClientSocket.getInstance();
+			client.start();
+			client.sendMessageToServer("Poruka...");
 
-			
-			
-		   server.addListener(new Listener() {
-		       public void received (Connection connection, Object object) {
-		          if (object instanceof SomeRequest) {
-		             SomeRequest request = (SomeRequest)object;
-		             System.out.println(request.text);
-
-		             SomeResponse response = new SomeResponse();
-		             response.text = "Thanks";
-		             connection.sendTCP(response);
-		          }
-		       }
-		    });
-		   
 		}
 	};
 	
@@ -188,33 +171,9 @@ public class MainForm {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
+
+			server.sendMessageToClient("Client? - U mad?");
 			
-			Client client = new Client();
-		    client.start();
-		    try {
-				client.connect(5000, "localhost", 1234);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		    Kryo kryo = client.getKryo();
-		    kryo.register(SomeRequest.class);
-		    kryo.register(SomeResponse.class);
-
-
-		    
-		    client.addListener(new Listener() {
-		        public void received (Connection connection, Object object) {
-		           if (object instanceof SomeResponse) {
-		              SomeResponse response = (SomeResponse)object;
-		              System.out.println(response.text);
-		           }
-		        }
-		     });
-		   
-		    SomeRequest request = new SomeRequest();
-		    request.text = "Here is the request...";
-		    client.sendTCP(request);
 		}
 	};
 }
