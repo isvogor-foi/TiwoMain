@@ -1,6 +1,12 @@
 package com.tiwo.communication.sockets;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+
+import javax.imageio.ImageIO;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -70,6 +76,16 @@ public class ClientSocket {
 			if (object instanceof RpiExchangePackage) {
 				RpiExchangePackage response = (RpiExchangePackage) object;
 				System.out.println(response.getMessage());
+				
+				// reconstruct the image
+				InputStream in = new ByteArrayInputStream(response.img);
+				try{
+					BufferedImage bi = ImageIO.read(in);
+					ImageIO.write(bi, "jpg", new File("java-converted-from-jni.jpg"));
+					System.out.println("Success!");
+				} catch (IOException ex){
+					ex.printStackTrace();
+				}
 			}
 		}
 	};

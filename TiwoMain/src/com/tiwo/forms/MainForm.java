@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -190,7 +191,32 @@ public class MainForm {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// do some stuff here!
+			ClientSocket client = ClientSocket.getInstance();
+			client.startRemote();
+			
+			// get image bytes
+			BufferedImage rawImage = null;
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			byte[] bytes = null;
+		
+			try {
+				rawImage = ImageIO.read(new File("/home/ivan/Dev/java/temp/cap2g.jpg"));
+
+				ImageIO.write(rawImage, "jpg", baos);
+				baos.flush();
+				bytes = baos.toByteArray();
+				baos.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+			
+			RpiExchangePackage packet = new RpiExchangePackage();
+			packet.setFpgaCommand("sobel gauss");
+			packet.img = bytes;
+			packet.setMessage("Message size (" + bytes.length + ")");
+			
+			client.sendPackageToServer(packet);
+			
 		}
 	};
 }
