@@ -3,25 +3,23 @@ package com.tiwo.forms;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Server;
 import com.tiwo.communication.Commands;
 import com.tiwo.communication.Commands.MOVEMENT;
 import com.tiwo.communication.Serial;
 import com.tiwo.communication.sockets.ClientSocket;
+import com.tiwo.communication.sockets.RpiExchangePackage;
 import com.tiwo.communication.sockets.ServerSocket;
-import com.tiwo.communication.sockets.SomeRequest;
-import com.tiwo.communication.sockets.SomeResponse;
 import com.tiwo.keyboard.KeyDispatcher;
 
 public class MainForm {
@@ -75,7 +73,7 @@ public class MainForm {
 		
 		// button for testing stuff
 		
-		btnTest = new JButton("Server");
+		btnTest = new JButton("Test local server");
 		btnTest.setBounds(10, 95, 133, 23);
 		btnTest.addActionListener(btnTestListener);
 		
@@ -92,6 +90,10 @@ public class MainForm {
 		frame.getContentPane().add(btnEnableKeyboard);
 		frame.getContentPane().add(btnTest);
 		frame.getContentPane().add(btnTest2);
+		
+		JButton btnNewButton = new JButton("New button");
+		btnNewButton.setBounds(20, 161, 117, 25);
+		frame.getContentPane().add(btnNewButton);
 	}
 	
 	/**
@@ -150,20 +152,37 @@ public class MainForm {
 		}
 	};
 	
-	ClientSocket client;
-	ServerSocket server;
+
 	ActionListener btnTestListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-		   //ServerSocket
-			server = ServerSocket.getInstance();
+			// test server locally
+			ServerSocket server = ServerSocket.getInstance();
 			server.start();
-	
 			
-			client = ClientSocket.getInstance();
-			client.start();
-			client.sendMessageToServer("Poruka...");
-
+			ClientSocket client = ClientSocket.getInstance();
+			client.startLocally();
+			
+			// read test image
+			BufferedImage img = null;
+			try{
+				img = ImageIO.read(new File("/home/ivan/Dev/java/temp/cap2g.jpg"));
+			} catch (IOException ex){
+				ex.printStackTrace();
+			}
+			
+			byte[] pixels = ((DataBufferByte) img.getRaster().getDataBuffer()).getData();
+			
+			RpiExchangePackage packet = new RpiExchangePackage();
+			packet.setFpgaCommand("sobel gauss");
+			packet.img = pixels;
+			packet.setMessage("Message size (" + pixels.length + ")");
+			
+			client.sendPackageToServer(packet);
+			
+			// release the resources
+			client.stop();
+			server.stop();
 		}
 	};
 	
@@ -171,9 +190,7 @@ public class MainForm {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
-			server.sendMessageToClient("Client? - U mad?");
-			
+			// do some stuff here!
 		}
 	};
 }
