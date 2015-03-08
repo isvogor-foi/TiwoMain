@@ -1,16 +1,25 @@
 package com.tiwo.communication.sockets;
 
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
+import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.tiwo.forms.MainForm;
 
 public class ClientSocket {
 
@@ -65,7 +74,7 @@ public class ClientSocket {
 	public void sendPackageToServer(RpiExchangePackage command){
 		clientInstance.sendTCP(command);
 	}
-	
+
 	
 	/**
 	 * Handle what happens when client receives a message from the server 
@@ -77,17 +86,42 @@ public class ClientSocket {
 				RpiExchangePackage response = (RpiExchangePackage) object;
 				System.out.println(response.getMessage());
 				
+				System.out.println(response.img.length);
+				
 				// reconstruct the image
-				InputStream in = new ByteArrayInputStream(response.img);
+				ByteArrayInputStream in = new ByteArrayInputStream(response.img);
 				try{
-					BufferedImage bi = ImageIO.read(in);
-					ImageIO.write(bi, "jpg", new File("java-converted-from-jni.jpg"));
-					System.out.println("Success!");
+					//BufferedImage bi = ImageIO.read(in);
+					BufferedImage bi = getGrayscale(320, response.img);
+					if(bi != null){
+						MainForm.setImage(bi);
+						ImageIO.write(bi, "jpg", new File("java-converted-from-jni.jpg"));
+						System.out.println("Success!");
+					}
+					else{
+						ImageIO.write(bi, "jpg", new File("java-converted-from-jni.jpg"));
+						System.out.println("Fail!");
+					}
+					
 				} catch (IOException ex){
 					ex.printStackTrace();
 				}
 			}
 		}
 	};
+	
+	public BufferedImage getGrayscale(int width, byte[] buffer) { 
+		System.out.println("Buffer lenght: " + buffer.length);
+		int height = buffer.length / width;
+	    ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+	    int[] nBits = { 8 };
+	    ColorModel cm = new ComponentColorModel(cs, nBits, false, true, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+	    SampleModel sm = cm.createCompatibleSampleModel(width, height);
+	    DataBufferByte db = new DataBufferByte(buffer, width * height);
+	    WritableRaster raster = Raster.createWritableRaster(sm, db, null);
+	    BufferedImage result = new BufferedImage(cm, raster, false, null);
+
+	    return result;
+	}
 
 }

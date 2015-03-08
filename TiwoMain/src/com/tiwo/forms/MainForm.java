@@ -1,5 +1,7 @@
 package com.tiwo.forms;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,9 +13,14 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.text.html.ImageView;
 
 import com.tiwo.communication.Commands;
 import com.tiwo.communication.Commands.MOVEMENT;
@@ -31,9 +38,14 @@ public class MainForm {
 	private JComboBox<Object> cmbPorts;
 	private JButton btnConnect;
 	private JButton btnEnableKeyboard;
-	private JButton btnTest;
-	private JButton btnTest2;
+	private JButton btnLocalTest;
+	private JButton btnSendToClient;
+	private JButton btnOpenFile;
+	private static JPanel imageViewJpanel;
 	private boolean listeningKeyEvents = false;
+	
+	// default
+	private String openFileLocation = "/home/ivan/Dev/java/temp/cap2g.jpg";
 	
 	public MainForm() {
 		initialize();
@@ -74,14 +86,22 @@ public class MainForm {
 		
 		// button for testing stuff
 		
-		btnTest = new JButton("Test local server");
-		btnTest.setBounds(10, 95, 133, 23);
-		btnTest.addActionListener(btnTestListener);
+		btnLocalTest = new JButton("Test local server");
+		btnLocalTest.setBounds(10, 95, 133, 23);
+		btnLocalTest.addActionListener(btnLocalTestListener);
 		
-		btnTest2 = new JButton("Client");
-		btnTest2.setBounds(10, 130, 133, 23);
-		btnTest2.addActionListener(btnTest2Listener);
-
+		btnSendToClient = new JButton("Send to client");
+		btnSendToClient.setBounds(10, 130, 133, 23);
+		btnSendToClient.addActionListener(btnSendToClientListener);
+		
+		imageViewJpanel = new JPanel();
+		imageViewJpanel.setLocation(234, 117);
+		imageViewJpanel.setSize(320, 240);
+		imageViewJpanel.setBackground(Color.black);
+		
+		btnOpenFile = new JButton("Open file");		
+		btnOpenFile.setBounds(10, 164, 89, 23);
+		btnOpenFile.addActionListener(btnOpenFileListener);
 		
 		// add widgets to the frame 
 		frame.getContentPane().add(btnSend);
@@ -89,12 +109,19 @@ public class MainForm {
 		frame.getContentPane().add(cmbPorts);
 		frame.getContentPane().add(btnConnect);
 		frame.getContentPane().add(btnEnableKeyboard);
-		frame.getContentPane().add(btnTest);
-		frame.getContentPane().add(btnTest2);
-		
-		JButton btnNewButton = new JButton("New button");
-		btnNewButton.setBounds(20, 161, 117, 25);
-		frame.getContentPane().add(btnNewButton);
+		frame.getContentPane().add(btnLocalTest);
+		frame.getContentPane().add(btnSendToClient);
+		frame.getContentPane().add(imageViewJpanel);
+		frame.getContentPane().add(btnOpenFile);
+	}
+	
+	public static void setImage(BufferedImage bi){
+		ImageIcon image = new ImageIcon(bi);
+		JLabel label = new JLabel();
+		label.setIcon(new ImageIcon(bi));
+		imageViewJpanel.add(label);
+		imageViewJpanel.revalidate();
+		imageViewJpanel.repaint();
 	}
 	
 	/**
@@ -154,7 +181,7 @@ public class MainForm {
 	};
 	
 
-	ActionListener btnTestListener = new ActionListener() {
+	ActionListener btnLocalTestListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// test server locally
@@ -167,7 +194,7 @@ public class MainForm {
 			// read test image
 			BufferedImage img = null;
 			try{
-				img = ImageIO.read(new File("/home/ivan/Dev/java/temp/cap2g.jpg"));
+				img = ImageIO.read(new File("/home/ivan/Dev/java/temp/cap1g.jpg"));
 			} catch (IOException ex){
 				ex.printStackTrace();
 			}
@@ -187,7 +214,7 @@ public class MainForm {
 		}
 	};
 	
-	ActionListener btnTest2Listener = new ActionListener() {
+	ActionListener btnSendToClientListener = new ActionListener() {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -200,8 +227,8 @@ public class MainForm {
 			byte[] bytes = null;
 		
 			try {
-				rawImage = ImageIO.read(new File("/home/ivan/Dev/java/temp/cap2g.jpg"));
-
+				rawImage = ImageIO.read(new File(openFileLocation));
+				
 				ImageIO.write(rawImage, "jpg", baos);
 				baos.flush();
 				bytes = baos.toByteArray();
@@ -211,7 +238,7 @@ public class MainForm {
 			}
 			
 			RpiExchangePackage packet = new RpiExchangePackage();
-			packet.setFpgaCommand("sobel gauss");
+			packet.setFpgaCommand("gauss sobel");
 			packet.img = bytes;
 			packet.setMessage("Message size (" + bytes.length + ")");
 			
@@ -219,4 +246,18 @@ public class MainForm {
 			
 		}
 	};
+	
+	ActionListener btnOpenFileListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fc = new JFileChooser();
+			int returnVal = fc.showOpenDialog((Component) e.getSource());
+			
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				System.out.println(fc.getSelectedFile().getAbsolutePath());
+				openFileLocation = fc.getSelectedFile().getAbsolutePath();
+			}
+		}
+	};
+	
 }
