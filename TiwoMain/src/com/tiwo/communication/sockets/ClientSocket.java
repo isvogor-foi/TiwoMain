@@ -20,6 +20,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.tiwo.forms.MainForm;
+import com.tiwo.main.Measurement;
 
 public class ClientSocket {
 
@@ -87,6 +88,8 @@ public class ClientSocket {
 				System.out.println(response.getMessage());
 				
 				System.out.println(response.img.length);
+				Measurement.stopMeasuring();
+				Measurement.result();
 				
 				// reconstruct the image
 				ByteArrayInputStream in = new ByteArrayInputStream(response.img);
