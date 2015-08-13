@@ -175,6 +175,17 @@ public class MainForm {
 		imageViewJpanel.repaint();
 	}
 	
+	public BufferedImage loadImage(String filename){
+		// read test image
+		BufferedImage img = null;
+		try{
+			img = ImageIO.read(new File(filename));
+		} catch (IOException ex){
+			ex.printStackTrace();
+		}
+		return img;
+	}
+	
 	/**
 	 * Action listeners
 	 */
@@ -196,7 +207,7 @@ public class MainForm {
 		}
 	};
 	
-	ActionListener sendButtonAction = new ActionListener() {
+	public ActionListener sendButtonAction = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
@@ -209,7 +220,7 @@ public class MainForm {
 		}
 	};
 	
-	ActionListener keyboardEnableAction = new ActionListener() {
+	public ActionListener keyboardEnableAction = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			listeningKeyEvents = !listeningKeyEvents;
@@ -232,7 +243,7 @@ public class MainForm {
 	};
 	
 
-	ActionListener btnLocalTestListener = new ActionListener() {
+	public ActionListener btnLocalTestListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// test server locally
@@ -266,7 +277,7 @@ public class MainForm {
 		}
 	};
 	
-	ActionListener btnSendToClientListener = new ActionListener() {
+	public ActionListener btnSendToClientListener = new ActionListener() {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -327,12 +338,14 @@ public class MainForm {
 		}
 	};
 	
-	ActionListener btnTestScriptClickListener = new ActionListener() {
+	public ActionListener btnTestScriptClickListener = new ActionListener() {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			MissionManagerMain mm = new MissionManagerMain();
+			
+			MissionManagerMain mm = new MissionManagerMain("/home/ivan/git/MissionManager/MissionManager/src/com/tiwo/missions/demo.mis");
 		}
+		
 	};
 	
 	private JTabbedPane tabbedPane;
