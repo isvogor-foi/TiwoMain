@@ -28,7 +28,7 @@ import com.tiwo.communication.sockets.ClientSocket;
 import com.tiwo.communication.sockets.RpiExchangePackage;
 import com.tiwo.communication.sockets.ServerSocket;
 import com.tiwo.keyboard.KeyDispatcher;
-import com.tiwo.main.Measurement;
+//import com.tiwo.main.Measurement;
 import com.tiwo.mission.MissionManagerMain;
 
 import javax.swing.JTabbedPane;
@@ -83,6 +83,7 @@ public class MainForm {
 		btnConnect.addActionListener(connectButtonAction);
 		
 		cmbPorts = new JComboBox<Object>(Serial.getInstance().getPorts().toArray());
+		//cmbPorts = new JComboBox<>();
 		cmbPorts.setBounds(170, 33, 118, 24);
 		
 		btnEnableKeyboard = new JButton("Enable keyboard");
@@ -307,9 +308,9 @@ public class MainForm {
 			//packet.setFpgaCommand("gauss sobel erode hyst");
 			packet.img = bytes;
 			packet.setMessage("Message size (" + bytes.length + ")");
-			//client.sendPackageToServer(packet);
+			client.sendPackageToServer(packet);
 
-			
+			/*
 			for( int i = 0; i <= 550; i++){
 				Measurement.startMeasuring();
 				System.out.println("At: " + i);
@@ -321,7 +322,7 @@ public class MainForm {
 					e1.printStackTrace();
 				}
 			}
-			
+			*/
 		}
 	};
 	

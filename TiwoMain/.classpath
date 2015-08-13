@@ -14,18 +14,13 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.swt"/>
 	<classpathentry kind="lib" path="jgoodies-forms-1.8.0.jar" sourcepath="jgoodies-forms-1.8.0-sources.jar"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="/home/ivan/Dev/java/lib/rxtx-2.1-7-bins-r2/RXTXcomm.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="E:/Dev/Java/libs"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/kryonet"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/MissionManager"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/kryonet"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/TiwoCommunication"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
